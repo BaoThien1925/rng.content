@@ -1,55 +1,111 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. CẤU HÌNH TRANG STREAMLIT (SỬA ICON)
+# 1. CẤU HÌNH TRANG (ĐỔI TÊN & ICON)
 st.set_page_config(
-    page_title="Product Master Data - Coffee Edition", 
+    page_title="Premium Coffee - Product Master Data", 
     page_icon="☕",
     layout="wide"
 )
 
-# 2. CSS CUSTOM CHO TYPOGRAPHY & HIERARCHY (COFFEE THEME)
+# 2. CSS "WOW EFFECT" - HIỆU ỨNG KÍNH MỜ & HÌNH NỀN SANG TRỌNG
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600&display=swap');
+    /* Import 2 font chữ cao cấp từ Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Mulish:wght@400;600&display=swap');
     
-    /* Ghi đè Font chữ chung */
-    html, body, [class*="css"] {
-        font-family: 'Mulish', sans-serif;
+    /* 1. Đổi hình nền toàn trang (Ảnh hạt cà phê chất lượng cao) + Phủ gradient tối */
+    .stApp {
+        background: linear-gradient(rgba(20, 10, 5, 0.7), rgba(20, 10, 5, 0.85)), 
+                    url("https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop") center/cover no-repeat fixed !important;
     }
     
-    /* Font cho các Tiêu đề (Hierarchy) */
+    /* 2. Thiết lập font chữ chung (Màu kem sáng) */
+    html, body, [class*="css"], .stTextInput p, .stTextArea p {
+        font-family: 'Mulish', sans-serif !important;
+        color: #EFEBE9 !important; 
+    }
+    
+    /* 3. Tiêu đề sang trọng (Playfair Display) */
     h1, h2, h3 {
-        font-family: 'Lora', serif !important;
-        color: #3E2723 !important;
+        font-family: 'Playfair Display', serif !important;
+        color: #D7CCC8 !important; 
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.6) !important;
+    }
+    h1 {
+        text-align: center;
+        font-size: 3.2rem !important;
+        margin-bottom: 0.5rem !important;
+        color: #E6C49F !important; /* Màu vàng Gold */
     }
     
-    /* Căn chỉnh khoảng cách Title */
-    .stApp > header {
-        background-color: transparent !important;
+    /* 4. HIỆU ỨNG GLASSMORPHISM CHO KHUNG NHẬP LIỆU (Mờ ảo) */
+    div[data-testid="stForm"] {
+        background: rgba(30, 15, 8, 0.45) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 20px !important;
+        padding: 40px !important;
+        box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.6) !important;
     }
     
-    /* Chỉnh nút bấm thành màu Espresso */
+    /* 5. Làm đẹp ô gõ chữ */
+    .stTextInput input, .stTextArea textarea {
+        background-color: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid #795548 !important;
+        border-radius: 10px !important;
+        color: #FFF !important;
+        font-size: 15px !important;
+        padding: 12px !important;
+        transition: 0.3s;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #E6C49F !important;
+        box-shadow: 0 0 10px rgba(230, 196, 159, 0.4) !important;
+    }
+
+    /* 6. Nút bấm (Button) phong cách Premium */
     .stButton>button {
-        background-color: #4E342E !important;
-        color: #F9F6F0 !important;
-        border-radius: 6px !important;
-        border: none !important;
+        background: linear-gradient(135deg, #8D6E63 0%, #4E342E 100%) !important;
+        color: #FFF !important;
+        border-radius: 10px !important;
+        border: 1px solid #A1887F !important;
+        font-family: 'Mulish', sans-serif !important;
         font-weight: 600 !important;
-        transition: 0.3s ease-in-out;
+        font-size: 16px !important;
+        padding: 12px 24px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .stButton>button:hover {
-        background-color: #3E2723 !important;
-        box-shadow: 0 4px 12px rgba(62, 39, 35, 0.2) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 25px rgba(141, 110, 99, 0.6) !important;
+        border-color: #E6C49F !important;
+        color: #E6C49F !important;
     }
     
-    /* Định dạng lại khối kết quả */
-    .stMarkdown p {
-        line-height: 1.7;
+    /* 7. Khung kết quả màu sáng để dễ copy */
+    div[data-testid="stTabs"] {
+        background: rgba(249, 246, 240, 0.95) !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+        color: #3E2723 !important;
+    }
+    div[data-testid="stTabs"] h1, div[data-testid="stTabs"] h2, div[data-testid="stTabs"] h3 {
+        color: #3E2723 !important;
+        text-shadow: none !important;
+    }
+    div[data-testid="stTabs"] p, div[data-testid="stTabs"] li {
+        color: #4E342E !important;
+        font-size: 15px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
+# 3. KẾT NỐI API
 API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 
 if not API_KEY:
@@ -58,7 +114,7 @@ if not API_KEY:
 
 genai.configure(api_key=API_KEY)
 
-# 3. SIÊU CÂU LỆNH (SUPER PROMPT)
+# 4. LUẬT AI XỬ LÝ DỮ LIỆU
 SYSTEM_INSTRUCTION = """
 Bạn là một Chuyên gia Đa nhiệm (Quản trị danh mục sản phẩm, SEO E-commerce, Data Analyst và Content Copywriter) chuyên ngành Cà phê & Đồ uống.
 Nhiệm vụ của bạn là tiếp nhận "Tên sản phẩm gốc" và "Thông tin thương hiệu", sau đó xử lý và trả về MỘT KẾT QUẢ DUY NHẤT chứa toàn bộ dữ liệu đã được chuẩn hóa.
@@ -111,52 +167,52 @@ QUY TẮC CỐ ĐỊNH CHUNG:
 [Nội dung]
 """
 
-# KHẮC PHỤC LỖI MODEL 404 BẰNG 'gemini-1.5-flash-latest'
+# ĐÃ KHẮC PHỤC LỖI MODEL (Chuyển về chuẩn gemini-1.5-flash)
 @st.cache_resource
 def get_model():
     return genai.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",
+        model_name="gemini-1.5-flash",
         system_instruction=SYSTEM_INSTRUCTION
     )
 
 model = get_model()
 
-# 4. GIAO DIỆN NGƯỜI DÙNG
-st.title("☕ Hệ Thống Xử Lý Dữ Liệu Sản Phẩm")
-st.markdown("*Chuẩn hóa thông tin, trích xuất Master Data và tạo Content SEO cho danh mục Cà phê.*")
-st.divider()
+# 5. GIAO DIỆN HIỂN THỊ
+st.markdown("<h1>☕ HỆ THỐNG XỬ LÝ DỮ LIỆU SẢN PHẨM</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px; margin-bottom: 40px;'>Chuẩn hóa thông tin, trích xuất Master Data và tạo Content SEO cho danh mục Cà phê cao cấp.</p>", unsafe_allow_html=True)
 
 with st.form("product_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Tên Sản Phẩm Gốc")
-        product_name = st.text_input("Nhập tên từ nhà cung cấp:", placeholder="VD: Cà phê Arabica Cầu Đất...")
+        st.markdown("<h3>Tên Sản Phẩm Gốc</h3>", unsafe_allow_html=True)
+        product_name = st.text_input("", placeholder="Nhập tên từ nhà cung cấp... (VD: Cà phê Arabica Cầu Đất)")
     
     with col2:
-        st.subheader("Thông tin từ Thương hiệu")
+        st.markdown("<h3>Thông tin từ Thương hiệu</h3>", unsafe_allow_html=True)
         raw_description = st.text_area(
-            "Nhập toàn bộ mô tả, tính năng, thông số:", 
-            height=150,
-            placeholder="Dán toàn bộ thông tin nhà cung cấp đưa vào đây..."
+            "", 
+            height=130,
+            placeholder="Dán toàn bộ mô tả, tính năng, thông số vào đây..."
         )
         
     st.markdown("<br>", unsafe_allow_html=True)
-    submitted = st.form_submit_button("☕ Xử lý Dữ liệu Ngay", use_container_width=True)
+    submitted = st.form_submit_button("✨ Bắt đầu chuẩn hóa dữ liệu", use_container_width=True)
 
-# 5. XỬ LÝ & HIỂN THỊ
+# 6. XỬ LÝ LOGIC
 if submitted:
     if not product_name.strip() and not raw_description.strip():
-        st.warning("Vui lòng nhập dữ liệu đầu vào!")
+        st.warning("⚠️ Vui lòng nhập dữ liệu đầu vào trước khi xử lý!")
     else:
-        with st.spinner("Đang rang xay dữ liệu... (Vui lòng đợi 5-10 giây)"):
+        with st.spinner("⏳ Máy đang rang xay dữ liệu... (Vui lòng đợi 5-10 giây)"):
             prompt_to_ai = f"TÊN SẢN PHẨM GỐC:\n{product_name}\n\nTHÔNG TIN DO THƯƠNG HIỆU CUNG CẤP:\n{raw_description}"
             
             try:
                 response = model.generate_content(prompt_to_ai)
-                st.success("✨ Cà phê đã pha xong! Dữ liệu của bạn đây:")
                 
-                tab1, tab2 = st.tabs(["👁️ Xem trước hiển thị", "📋 Copy để dán vào File/Web"])
+                st.markdown("<br><h3>🎯 KẾT QUẢ ĐẦU RA</h3>", unsafe_allow_html=True)
+                
+                tab1, tab2 = st.tabs(["👁️ Xem trước kết quả", "📋 Copy Code dán vào File/Web"])
                 
                 with tab1:
                     st.markdown(response.text)
