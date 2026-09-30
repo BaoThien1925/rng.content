@@ -3,118 +3,129 @@ import google.generativeai as genai
 import json
 
 # ==========================================
-# 1. CẤU HÌNH TRANG (CHUYÊN NGHIỆP, TỐI GIẢN)
+# 1. CẤU HÌNH TRANG: MODERN LIGHT SAAS
 # ==========================================
 st.set_page_config(
-    page_title="Product Master Data - Coffee", 
-    page_icon="☕",
+    page_title="Product Master Data - Workspace", 
+    page_icon="📦",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# CSS Thiết kế dạng Bảng (Card Layout)
+# CSS MỚI: GIAO DIỆN SÁNG, CHUYÊN NGHIỆP, TỐI GIẢN
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     
     /* Ẩn Header mặc định */
     header[data-testid="stHeader"] { display: none !important; }
     
-    /* Nền Tối Sang Trọng (Màu Xám Đen Nhám) */
+    /* Nền trang xám nhạt dịu mắt, chữ xám đen */
     .stApp {
-        background-color: #121212 !important;
-        color: #E0E0E0 !important;
-        font-family: 'Montserrat', sans-serif !important;
+        background-color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
+        color: #0F172A !important;
     }
     
-    /* Tiêu đề */
-    h1 {
-        font-family: 'Playfair Display', serif !important;
-        color: #D4AF37 !important; /* Vàng Gold */
-        text-align: center;
-        font-size: 2.5rem !important;
-        margin-top: 1rem !important;
+    /* Tiêu đề thanh lịch */
+    h1, h2, h3 {
+        font-family: 'Inter', sans-serif !important;
+        color: #1E293B !important;
+        font-weight: 700 !important;
     }
-    h3 { color: #D4AF37 !important; }
     
-    /* Khung nhập liệu (Form) */
+    /* Khung nhập liệu (Form) - Box trắng, bóng đổ nhẹ */
     div[data-testid="stForm"] {
-        background: #1E1E1E !important;
-        border: 1px solid #333 !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
         border-radius: 12px !important;
-        padding: 30px !important;
+        padding: 32px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
     }
     
     /* Ô text gõ chữ */
     .stTextInput input, .stTextArea textarea {
-        background-color: #2A2A2A !important;
-        border: 1px solid #444 !important;
-        color: #FFF !important;
+        background-color: #F1F5F9 !important;
+        border: 1px solid #CBD5E1 !important;
+        color: #0F172A !important;
         border-radius: 8px !important;
+        font-size: 15px !important;
+        padding: 12px !important;
+        transition: 0.2s ease;
     }
     .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #D4AF37 !important;
-        box-shadow: 0 0 5px rgba(212, 175, 55, 0.5) !important;
+        background-color: #FFFFFF !important;
+        border-color: #8B5A2B !important;
+        box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.15) !important;
     }
     
-    /* Nút bấm (Button) */
+    /* Nút bấm (Button) - Màu Nâu Cà Phê Sang Trọng */
     [data-testid="stFormSubmitButton"] button {
-        background: #D4AF37 !important;
-        color: #121212 !important;
-        font-weight: bold !important;
+        background-color: #8B5A2B !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
         border-radius: 8px !important;
-        padding: 10px 0 !important;
-        text-transform: uppercase;
+        padding: 12px 24px !important;
         border: none !important;
+        transition: 0.2s ease;
     }
     [data-testid="stFormSubmitButton"] button:hover {
-        background: #E5C158 !important;
+        background-color: #6F4520 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3) !important;
     }
     
-    /* === THIẾT KẾ CÁC Ô KẾT QUẢ (CARDS) === */
-    .metric-card {
-        background-color: #1E1E1E;
-        border: 1px solid #333;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-left: 4px solid #D4AF37;
+    /* === THIẾT KẾ CÁC Ô KẾT QUẢ DẠNG BẢNG (GRID CARDS) === */
+    .grid-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-left: 4px solid #8B5A2B;
     }
-    .metric-title {
+    .grid-label {
         font-size: 12px;
-        color: #9E9E9E;
+        color: #64748B;
         text-transform: uppercase;
         font-weight: 600;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
     }
-    .metric-value {
+    .grid-value {
         font-size: 16px;
-        color: #FFFFFF;
+        color: #0F172A;
         font-weight: 500;
-        word-wrap: break-word;
     }
     
-    .content-box {
-        background-color: #1E1E1E;
-        border: 1px solid #333;
-        border-radius: 8px;
-        padding: 20px;
+    /* Thẻ Content dài */
+    .content-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 24px;
         margin-bottom: 20px;
-        color: #E0E0E0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .content-title {
-        color: #D4AF37;
-        font-family: 'Playfair Display', serif;
-        font-size: 20px;
-        border-bottom: 1px solid #333;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
+        color: #1E293B;
+        font-size: 18px;
+        font-weight: 700;
+        border-bottom: 2px solid #F1F5F9;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+    .content-body {
+        color: #334155;
+        line-height: 1.7;
+        font-size: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. KẾT NỐI API & THIẾT LẬP PROMPT
+# 2. KẾT NỐI API & BẮT LỖI TỰ ĐỘNG
 # ==========================================
 API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 if not API_KEY:
@@ -122,7 +133,7 @@ if not API_KEY:
     st.stop()
 genai.configure(api_key=API_KEY)
 
-# ÉP GEMINI TRẢ VỀ ĐỊNH DẠNG JSON ĐỂ CHIA Ô RÕ RÀNG
+# PROMPT ÉP XUẤT RA JSON
 SYSTEM_INSTRUCTION = """
 Bạn là Data Specialist và Content Copywriter E-commerce chuyên ngành Cà phê.
 Nhiệm vụ: Phân tích Tên gốc và Thông tin thương hiệu, chuẩn hóa và trả về kết quả định dạng JSON.
@@ -148,95 +159,104 @@ Trả về CHÍNH XÁC cấu trúc JSON sau, không được thêm bất kỳ te
 LƯU Ý: Nếu không có thông tin, ghi "Chưa cung cấp".
 """
 
-# Tôi sử dụng gemini-1.5-flash theo nhu cầu tốc độ của bạn.
-@st.cache_resource
-def get_model():
-    return genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        system_instruction=SYSTEM_INSTRUCTION
-    )
-model = get_model()
-
 # ==========================================
 # 3. GIAO DIỆN CHÍNH
 # ==========================================
-st.markdown("<h1>TRỢ LÝ DỮ LIỆU CÀ PHÊ</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#9E9E9E; margin-bottom: 30px;'>Chuẩn hóa Master Data & Content SEO chuyên nghiệp</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; margin-top: 1rem;'>HỆ THỐNG MASTER DATA</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:#64748B; margin-bottom: 2rem;'>Chuẩn hóa dữ liệu Catalog & Content E-commerce</p>", unsafe_allow_html=True)
 
 with st.form("product_form"):
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("<div style='color:#D4AF37; font-weight:600; margin-bottom:5px;'>1. Tên Sản Phẩm Gốc</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-weight:600; margin-bottom:8px; color:#1E293B;'>Tên Sản Phẩm Gốc</div>", unsafe_allow_html=True)
         product_name = st.text_input("", placeholder="Nhập tên từ nhà cung cấp...", label_visibility="collapsed")
     with col2:
-        st.markdown("<div style='color:#D4AF37; font-weight:600; margin-bottom:5px;'>2. Thông tin từ Thương hiệu</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-weight:600; margin-bottom:8px; color:#1E293B;'>Thông tin từ Thương hiệu</div>", unsafe_allow_html=True)
         raw_description = st.text_area("", height=120, placeholder="Dán toàn bộ mô tả...", label_visibility="collapsed")
         
-    submitted = st.form_submit_button("TẠO DỮ LIỆU CHUẨN", use_container_width=True)
+    submitted = st.form_submit_button("TIẾN HÀNH CHUẨN HÓA DỮ LIỆU", use_container_width=True)
 
 # ==========================================
-# 4. XỬ LÝ & HIỂN THỊ DẠNG Ô (GRID CARDS)
+# 4. XỬ LÝ LOGIC & HIỂN THỊ DẠNG Ô
 # ==========================================
+def parse_json_safely(text):
+    """Hàm dọn dẹp kết quả rác để lấy đúng JSON"""
+    text = text.strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return json.loads(text.strip())
+
 if submitted:
     if not product_name.strip() and not raw_description.strip():
         st.warning("⚠️ Vui lòng nhập dữ liệu!")
     else:
-        with st.spinner("⏳ Đang phân tích... (Định dạng JSON)"):
-            prompt_to_ai = f"TÊN SẢN PHẨM GỐC:\n{product_name}\n\nTHÔNG TIN THƯƠNG HIỆU:\n{raw_description}"
+        with st.spinner("⏳ Hệ thống đang xử lý và phân tách dữ liệu..."):
+            prompt_to_ai = f"{SYSTEM_INSTRUCTION}\n\nTÊN SẢN PHẨM GỐC:\n{product_name}\n\nTHÔNG TIN THƯƠNG HIỆU:\n{raw_description}"
             
             try:
-                # Ép API trả JSON
-                response = model.generate_content(prompt_to_ai, generation_config={"response_mime_type": "application/json"})
+                # CƠ CHẾ AUTO-FALLBACK: Thử model xịn nhất trước, lỗi 404 thì lùi về model cơ bản
+                try:
+                    model = genai.GenerativeModel('gemini-1.5-pro')
+                    response = model.generate_content(prompt_to_ai)
+                except Exception as e:
+                    if "404" in str(e) or "not found" in str(e):
+                        # Lùi về model mặc định chắc chắn hoạt động
+                        model = genai.GenerativeModel('gemini-pro')
+                        response = model.generate_content(prompt_to_ai)
+                    else:
+                        raise e
+
+                # Đọc dữ liệu JSON
+                data = parse_json_safely(response.text)
                 
-                # Chuyển đổi kết quả AI thành Dictionary của Python
-                data = json.loads(response.text)
-                
-                st.markdown("<hr style='border-color: #333;'>", unsafe_allow_html=True)
-                st.markdown("<h3>🎯 KẾT QUẢ ĐẦU RA</h3>", unsafe_allow_html=True)
+                st.markdown("<hr style='border: 1px solid #E2E8F0; margin: 30px 0;'>", unsafe_allow_html=True)
+                st.markdown("<h2 style='margin-bottom: 20px;'>Kết Quả Đầu Ra</h2>", unsafe_allow_html=True)
                 
                 # --- PHẦN 1: TÊN SẢN PHẨM ---
                 st.markdown(f"""
-                <div class='content-box'>
-                    <div class='metric-title'>TÊN SẢN PHẨM CHUẨN HÓA</div>
-                    <div style='color:#D4AF37; font-size:22px; font-weight:bold;'>{data.get('ten_san_pham_chuan_hoa', '')}</div>
+                <div class='content-card'>
+                    <div class='grid-label'>TÊN SẢN PHẨM CHUẨN HÓA</div>
+                    <div style='color:#0F172A; font-size:24px; font-weight:700;'>{data.get('ten_san_pham_chuan_hoa', '')}</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                st.markdown("<div style='color:#D4AF37; font-weight:bold; margin-top:20px; margin-bottom:10px;'>📊 MASTER DATA (THÔNG SỐ CHÍNH)</div>", unsafe_allow_html=True)
-                
                 # --- PHẦN 2: CHIA CÁC Ô (GRID) CHO MASTER DATA ---
+                st.markdown("<h3 style='font-size:18px; margin: 24px 0 16px 0; color:#334155;'>📊 THÔNG SỐ MASTER DATA</h3>", unsafe_allow_html=True)
+                
                 md = data.get('master_data', {})
                 col_a, col_b, col_c, col_d = st.columns(4)
                 
                 with col_a:
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Thương hiệu</div><div class='metric-value'>{md.get('thuong_hieu', '')}</div></div>", unsafe_allow_html=True)
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Khối lượng (kg)</div><div class='metric-value'>{md.get('khoi_luong', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Thương hiệu</div><div class='grid-value'>{md.get('thuong_hieu', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Khối lượng (kg)</div><div class='grid-value'>{md.get('khoi_luong', '')}</div></div>", unsafe_allow_html=True)
                 with col_b:
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Giá vốn (VNĐ)</div><div class='metric-value'>{md.get('gia_von', '')}</div></div>", unsafe_allow_html=True)
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Loại hạt</div><div class='metric-value'>{md.get('loai_hat', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Giá vốn (VNĐ)</div><div class='grid-value'>{md.get('gia_von', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Loại hạt</div><div class='grid-value'>{md.get('loai_hat', '')}</div></div>", unsafe_allow_html=True)
                 with col_c:
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Đơn vị tính</div><div class='metric-value'>{md.get('don_vi_tinh', '')}</div></div>", unsafe_allow_html=True)
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Vùng trồng</div><div class='metric-value'>{md.get('nguon_goc', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Đơn vị tính</div><div class='grid-value'>{md.get('don_vi_tinh', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Vùng trồng</div><div class='grid-value'>{md.get('nguon_goc', '')}</div></div>", unsafe_allow_html=True)
                 with col_d:
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Mức độ rang</div><div class='metric-value'>{md.get('muc_do_rang', '')}</div></div>", unsafe_allow_html=True)
-                    st.markdown(f"<div class='metric-card'><div class='metric-title'>Hạn sử dụng</div><div class='metric-value'>{md.get('han_su_dung', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Mức độ rang</div><div class='grid-value'>{md.get('muc_do_rang', '')}</div></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='grid-card'><div class='grid-label'>Hạn sử dụng</div><div class='grid-value'>{md.get('han_su_dung', '')}</div></div>", unsafe_allow_html=True)
                 
                 # --- PHẦN 3: NỘI DUNG SEO ---
-                st.markdown("<div style='color:#D4AF37; font-weight:bold; margin-top:20px; margin-bottom:10px;'>📝 CONTENT SEO</div>", unsafe_allow_html=True)
+                st.markdown("<h3 style='font-size:18px; margin: 24px 0 16px 0; color:#334155;'>📝 NỘI DUNG SEO WEBSITE</h3>", unsafe_allow_html=True)
                 
                 mo_ta_chi_tiet_html = data.get('mo_ta_chi_tiet', '').replace('\n', '<br>')
                 
                 st.markdown(f"""
-                <div class='content-box'>
+                <div class='content-card'>
                     <div class='content-title'>MÔ TẢ NGẮN</div>
-                    <div style='line-height:1.6;'>{data.get('mo_ta_ngan', '')}</div>
+                    <div class='content-body'>{data.get('mo_ta_ngan', '')}</div>
                 </div>
                 
-                <div class='content-box'>
+                <div class='content-card'>
                     <div class='content-title'>MÔ TẢ CHI TIẾT</div>
-                    <div style='line-height:1.6;'>{mo_ta_chi_tiet_html}</div>
+                    <div class='content-body'>{mo_ta_chi_tiet_html}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
             except Exception as e:
-                st.error(f"Lỗi hệ thống: {e}")
+                st.error(f"Lỗi hệ thống: Cấu trúc AI trả về không đúng chuẩn. Vui lòng thử bấm lại! (Chi tiết: {e})")
